@@ -10,15 +10,49 @@ var config = {
   firebase.initializeApp(config);
   const database = firebase.database();
 const latest = database.ref('experiment/latest');
+var id = _uuid()
+
+
+
+console.log(id)
 
 $(document).ready(function () {
+    $('#idnumber').text(id)
+    pushData(database, 'id', {
+        uuid: `${id}`
+    })
+
+
     latest.on('value', function (snapshot) {
-        var color = snapshot.val().color
+        var data = snapshot.val()
     
-        if(color) {
-            $('body').css('background-color', `${color}`)
+        if(data) {
+            console.log(data.id)
+            console.log(id)
+            if(data.id == id) {
+                $('body').css('background-color', `${data.color}`)
+            }
         }
         
 
     });
 })
+
+function updataData(database, table, data) {
+    database.ref(`experiment/${table}`).update(data);
+}
+function pushData(database, table, data) {
+    database.ref(`experiment/${table}`).push(data);
+}
+
+function _uuid() {
+    var d = Date.now();
+    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+        d += performance.now(); //use high-precision timer if available
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+}
