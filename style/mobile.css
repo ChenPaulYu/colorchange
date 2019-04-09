@@ -1,0 +1,13 @@
+/* #bg {
+    min-height: 100%;
+    width: auto;
+    margin: 0;
+    background-color: black;
+} */
+
+body {
+    width: 100%;
+    margin: 0;
+    background-color: black;
+
+}
