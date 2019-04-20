@@ -9,9 +9,34 @@ var config = {
 firebase.initializeApp(config);
 const database = firebase.database();
 const id_table = database.ref('experiment/id');
-var uuid_list = new Set()
+var uuid_list = []
+
+var color = ['blue','red','green']
 
 $(document).ready(function() {
+
+
+    $('#half').on('click',function() {
+        var arr = uuid_list
+        arr.sort(randomsort);
+        var c = color[Math.round(Math.random() * color.length)]
+        for(var i = 0;i < arr.length/2;i++) {
+            updataData(database, 'latest', {
+                color: `${c}`,
+                id: `${arr[i]}`
+            })
+        }
+    })
+
+    $('#all').on('click', function() {
+        var c = color[Math.round(Math.random() * color.length)]
+        uuid_list.forEach(function(id){
+            updataData(database, 'latest', {
+                color: `${c}`,
+                id: `${id}`
+            })
+        })
+    })
 
     $('#green').on('click',function() {
         var id = $('input').val()
@@ -43,28 +68,27 @@ $(document).ready(function() {
 
     id_table.on('value', function (snapshot) {
         var id = snapshot.val()
-        uuid_list.clear();
+        uuid_list = []
+        $('ul').html('')
         for(i in id) {
-            console.log(id[i].uuid)
-            uuid_list.add(id[i].uuid)
-            $('ul').append(`<li>${id[i].uuid}</li>`)
-            // $('body').append(`<button id=${id[i].uuid}>User${count}</button>`)
+            uuid_list.push(id[i].uuid)
+            $('ul').append(`<li id='${id[i].uuid}'>${id[i].uuid}</li>`)
+            $('li').on('click',function() {
+                $('#user').val($(this).attr('id'))
+            })
         }
-        
-
-        // for(i in uuid_list) {
-        //     $('ul').append(`<li>${i}</li>`)
-        // }
-        
-
     });
     
 
 
 })
 
+function randomsort(a, b) {
+    return Math.random() > .5 ? -1 : 1;
+}
 
 function updataData(database, table, data) {
     database.ref(`experiment/${table}`).update(data);
 }
+
 
